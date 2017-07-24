@@ -1,0 +1,50 @@
+#!/usr/bin/env node
+/**
+ * * * * * * * * * * * * * * * * * * * *
+ *             Line Counter            *
+ * * * * * * * * * * * * * * * * * * * *
+ *                                     *
+ * Author  : Özgür Senekci             *
+ *                                     *
+ * Skype   :  socialinf                *
+ *                                     *
+ * License : The MIT License (MIT)     *
+ *                                     *
+ * * * * * * * * * * * * * * * * * * * *
+ */
+
+var args = {};
+
+process.argv.forEach(function(val){
+    if( val.indexOf("--") === 0 ){
+        var tokens = val.replace("--", "").split("=");
+        args[tokens[0]] = tokens.length === 1 ? true : tokens[1];
+    }
+});
+
+if( typeof args.path === 'undefined' ){
+    console.log("Missing path");
+}
+else{
+    const LineCounter = require("../index").LineCounter;
+    const ExtensionsFactory = require("../index").ExtensionsFactory;
+
+    var lc = new LineCounter();
+    lc.setPath(args.path);
+    if( typeof args.extensions !== 'undefined' ){
+        lc.setExtensions(ExtensionsFactory.from(args.extensions));
+    }
+    else if( typeof args.except !== 'undefined' ){
+        lc.setExtensions(ExtensionsFactory.except(args.except));
+    }
+    try{
+        lc.getLines(function(result){
+            console.log("Total files: " + result.files);
+            console.log("Total lines: " + result.lines);
+        });
+    }
+    catch(e){
+        console.log(e.message);
+    }
+}
+
