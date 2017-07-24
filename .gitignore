@@ -1,0 +1,8 @@
+.idea/
+node_modules/
+*.log
+*.gz
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store

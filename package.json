@@ -1,0 +1,27 @@
+{
+  "name": "line-counter-node",
+  "version": "1.0.0",
+  "description": "Recursive nodejs line counter library",
+  "author": "Özgür Senekci <ozgursenekci@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/social13/line-counter-node.git"
+  },
+  "homepage": "https://github.com/social13/line-counter-node#readme",
+  "keywords": [
+    "node",
+    "line",
+    "counter",
+    "linecounter"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "3.4.2"
+  },
+  "bugs": {
+    "url": "https://github.com/social13/line-counter-node/issues"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
