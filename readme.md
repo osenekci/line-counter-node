@@ -48,10 +48,10 @@ var ext = ExtensionsFactory.except(["js", "php", "java"]); // Array with extensi
 const ExtensionsFactory = require("line-counter-node").ExtensionsFactory;
 const LineCounter = require("line-counter-node").LineCounter;
 var lc = new LineCounter();
-lc->setPath("directory/path/");  // Sets the current directory which will be traversed
-lc->setExtensions(ExtensionsFactory.from("js"));  // Specify allowed/disallowed extensions. Set null (or never set anything) to disable extension filter and target all files with all extensions
-var files = lc->resolveTargetFiles();   // Traverses and returns target files as File array
-lc->getLines(function(result){  });   // Returns total files and total lines. Result is a json object like { files: 15, lines: 7854 }
+lc.setPath("directory/path/");  // Sets the current directory which will be traversed
+lc.setExtensions(ExtensionsFactory.from("js"));  // Specify allowed/disallowed extensions. Set null (or never set anything) to disable extension filter and target all files with all extensions
+var files = lc.resolveTargetFiles();   // Traverses and returns target files as File array
+lc.getLines(function(result){  });   // Returns total files and total lines. Result is a json object like { files: 15, lines: 7854 }
 ```
 
 ### Example Usage
@@ -59,9 +59,9 @@ lc->getLines(function(result){  });   // Returns total files and total lines. Re
 const ExtensionsFactory = require("line-counter-node").ExtensionsFactory;
 const LineCounter = require("line-counter-node").LineCounter;
 var lc = new LineCounter();
-lc->setPath("/var/www/html/");
-lc->setExtensions(ExtensionsFactory.from("js"));
-lc->getLines(function(result){
+lc.setPath("/var/www/html/");
+lc.setExtensions(ExtensionsFactory.from("js"));
+lc.getLines(function(result){
     console.log("Total files: " + result.files);
     console.log("Total lines: " + result.lines);
 });
