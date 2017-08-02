@@ -7,6 +7,7 @@ var fs = require("fs");
 var path = require("path");
 var LineCounter = require("../lib/LineCounter");
 var ExtensionsFactory = require("../lib/Extensions");
+var Rules = require("../lib/Rules");
 
 describe("LineCounter", function(){
 
@@ -78,6 +79,30 @@ describe("LineCounter", function(){
                 assert.equal(5, result.lines);
                 done();
             });
+        });
+    });
+
+    describe("#addRule()", function(){
+        it("should return only the files starts with file1", function(){
+            var lc = new LineCounter();
+            lc.setPath(path.join(__dirname, "dir"));
+            lc.addRule(Rules.filePrefix, "file1");
+            var result = lc.resolveTargetFiles();
+            var expected = [ path.join(__dirname, "dir", "file1.java"), path.join(__dirname, "dir", "file1.js") ];
+            for( var i = 0; i < expected.length; i++ ){
+                assert.equal(expected[i], result[i].getPath());
+            }
+        });
+        it("should ignore dir2 and dir3 directories", function(){
+            var lc = new LineCounter();
+            lc.setPath(path.join(__dirname, "dir"));
+            lc.addRule(Rules.ignoreDir, "dir2");
+            lc.addRule(Rules.ignoreDir, "dir3");
+            var result = lc.resolveTargetFiles();
+            var expected = [ path.join(__dirname, "dir", "file1.java"), path.join(__dirname, "dir", "file1.js") ];
+            for( var i = 0; i < expected.length; i++ ){
+                assert.equal(expected[i], result[i].getPath());
+            }
         });
     });
 

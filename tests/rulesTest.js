@@ -9,39 +9,66 @@ var path = require("path");
 
 describe("File", function(){
 
-    describe("#prefix()", function(){
+    var stats = {
+        isFile: function(){
+            return true;
+        },
+        isDirectory: function(){
+            return true;
+        }
+    };
+
+    describe("#filePrefix()", function(){
         it("should return true", function(){
-            assert.equal(true, Rules.prefix("fileName.ext", null, "fileN"));
+            assert.equal(true, Rules.filePrefix("fileName.ext", stats, "fileN"));
         });
         it("should return false", function(){
-            assert.equal(false, Rules.prefix("fileName.ext", null, "file1N"));
+            assert.equal(false, Rules.filePrefix("fileName.ext", stats, "file1N"));
         });
     });
 
-    describe("#postfix()", function(){
+    describe("#filePostfix()", function(){
         it("should return true", function(){
-            assert.equal(true, Rules.postfix("fileName.ext", null, "eName"));
+            assert.equal(true, Rules.filePostfix("fileName.ext", stats, "eName"));
         });
         it("should return false", function(){
-            assert.equal(false, Rules.postfix("fileName.ext", null, "2eName"));
+            assert.equal(false, Rules.filePostfix("fileName.ext", stats, "2eName"));
         });
     });
 
-    describe("#ignorePrefix()", function(){
+    describe("#fileIgnorePrefix()", function(){
         it("should return true", function(){
-            assert.equal(false, Rules.ignorePrefix("fileName.ext", null, "fileN"));
+            assert.equal(false, Rules.fileIgnorePrefix("fileName.ext", stats, "fileN"));
         });
         it("should return false", function(){
-            assert.equal(true, Rules.ignorePrefix("fileName.ext", null, "file1N"));
+            assert.equal(true, Rules.fileIgnorePrefix("fileName.ext", stats, "file1N"));
         });
     });
 
-    describe("#ignorePostfix()", function(){
+    describe("#fileIgnorePostfix()", function(){
         it("should return true", function(){
-            assert.equal(false, Rules.ignorePostfix("fileName.ext", null, "eName"));
+            assert.equal(false, Rules.fileIgnorePostfix("fileName.ext", stats, "eName"));
         });
         it("should return false", function(){
-            assert.equal(true, Rules.ignorePostfix("fileName.ext", null, "2eName"));
+            assert.equal(true, Rules.fileIgnorePostfix("fileName.ext", stats, "2eName"));
+        });
+    });
+
+    describe("#ignoreFile()", function(){
+        it("should return true", function(){
+            assert.equal(false, Rules.ignoreFile("fileName.ext", stats, "fileName.ext"));
+        });
+        it("should return false", function(){
+            assert.equal(true, Rules.ignoreFile("fileName.ext", stats, "fileName2.ext"));
+        });
+    });
+
+    describe("#ignoreDir()", function(){
+        it("should return true", function(){
+            assert.equal(false, Rules.ignoreDir("dirName", stats, "dirName"));
+        });
+        it("should return false", function(){
+            assert.equal(true, Rules.ignoreDir("dirName", stats, "dirName2"));
         });
     });
 
