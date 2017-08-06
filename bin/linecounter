@@ -28,6 +28,7 @@ if( typeof args.path === 'undefined' ){
 else{
     const LineCounter = require("../index").LineCounter;
     const ExtensionsFactory = require("../index").ExtensionsFactory;
+    const Rules = require("../index").Rules;
 
     var lc = new LineCounter();
     lc.setPath(args.path);
@@ -36,6 +37,34 @@ else{
     }
     else if( typeof args.except !== 'undefined' ){
         lc.setExtensions(ExtensionsFactory.except(args.except));
+    }
+    if( typeof args.rules !== 'undefined' ){
+        var rules = args.rules.split('|');
+        rules.forEach(function(rule){
+            if( rule.length === 0 ){
+                return;
+            }
+            if( rule.indexOf("(") > 0 ){
+                var ruleTokens = rule.replace("(", "+").replace(")", "").split("+"); // ignoreDir(test) -> ignoreDir+test
+                rule = ruleTokens[0];
+                var ruleArgs = ruleTokens[1].split(",");
+                if( typeof Rules[rule] !== 'undefined' ){
+                    ruleArgs.unshift(Rules[rule]); // Add rule to the beginning of the array
+                    lc.addRule.apply(lc, ruleArgs);
+                }
+                else{
+                    console.error("Rule not found: " + rule);
+                }
+            }
+            else{
+                if( typeof Rules[rule] !== 'undefined' ){
+                    lc.addRule(Rules[rule]);
+                }
+                else{
+                    console.error("Rule not found: " + rule);
+                }
+            }
+        });
     }
     try{
         lc.getLines(function(result){
