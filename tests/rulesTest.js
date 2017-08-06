@@ -63,12 +63,36 @@ describe("File", function(){
         });
     });
 
+    describe("#ignoreFiles()", function(){
+        it("should return false", function(){
+            assert.equal(false, Rules.ignoreFiles("fileName.ext", stats, "fileName.ext", "fileName2.ext"));
+        });
+        it("should return false", function(){
+            assert.equal(false, Rules.ignoreFiles("fileName2.ext", stats, "fileName.ext", "fileName2.ext"));
+        });
+        it("should return true", function(){
+            assert.equal(true, Rules.ignoreFiles("fileName.ext", stats, "fileName2.ext", "fileName3.ext"));
+        });
+    });
+
     describe("#ignoreDir()", function(){
         it("should return true", function(){
             assert.equal(false, Rules.ignoreDir("dirName", stats, "dirName"));
         });
         it("should return false", function(){
             assert.equal(true, Rules.ignoreDir("dirName", stats, "dirName2"));
+        });
+    });
+
+    describe("#ignoreDirs()", function(){
+        it("should return false", function(){
+            assert.equal(false, Rules.ignoreFiles("dirName", stats, "dirName", "dirName2"));
+        });
+        it("should return false", function(){
+            assert.equal(false, Rules.ignoreFiles("dirName2", stats, "dirName", "dirName2"));
+        });
+        it("should return true", function(){
+            assert.equal(true, Rules.ignoreFiles("dirName", stats, "dirName2", "dirName3"));
         });
     });
 
