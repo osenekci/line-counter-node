@@ -14,11 +14,12 @@ npm install -g line-counter-node
 
 ## CLI Usage
 After installing LineCounter, binary file will be added to path
-- {required} Path: The directory path which will be used as starting point
+- {optional} Path: The directory path which will be used as starting point. If path is not specified then target directory will be current directory
 - {optional} Extensions: Comma separated extension list. Only the files with given extensions will be counted
 - {optional} Except: Comma separated extension list which will be ignored
 - {optional} Rules: Additional rules. See available rules section for rule list
 ```bash
+linecounter # All files will be counted in current directory
 linecounter --path="path/to/directory"  # All files will be counted
 linecounter --path="path/to/directory" --extensions="comma, separated, extensions"
 linecounter --path="path/to/directory" --except="js"  # All files except the files with js extension will be counted
