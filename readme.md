@@ -24,7 +24,7 @@ linecounter --path="path/to/directory"  # All files will be counted
 linecounter --path="path/to/directory" --extensions="comma, separated, extensions"
 linecounter --path="path/to/directory" --except="js"  # All files except the files with js extension will be counted
 linecounter --path="path/to/directory" --rules="ignoreDir(node_modules)"
-lineCounter --path="path/to/directory" --rules="ignoreDir(node_modules)|filePostFix(test)"  # multiple rule usage. Separate rules with | character
+lineCounter --path="path/to/directory" --rules="ignoreHidden|filePostFix(test)"  # multiple rule usage. Separate rules with | character
 linecounter --path="path/to/directory" --rules="ignoreDirs(node_modules,tests,lib,src)"   # multiple aguments with one rule usage
 ```
 ### Example output
@@ -90,6 +90,7 @@ const Rules = require("line-counter-node").Rules;
 - Rules.ignoreFiles         // Ignore multiple files
 - Rules.ignoreDir           // Ignore directory rule
 - Rules.ignoreDirs          // Ignore multiple directories
+- Rules.ignoreHidden        // Ignores dotfiles and dotfolders (.git, .idea, .gitignore...)
 
 ### Example Usage
 ```node

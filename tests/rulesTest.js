@@ -96,4 +96,11 @@ describe("File", function(){
         });
     });
 
+    describe("#ingoreHidden()", function(){
+        it("should not accept dotfiles", function(){
+           assert.equal(false, Rules.ignoreHidden(".dirName", stats));
+            assert.equal(true, Rules.ignoreHidden("dirName", stats));
+        });
+    });
+
 });
