@@ -22,8 +22,16 @@ process.argv.forEach(function(val){
     }
 });
 
-if( typeof args.help !== 'undefined' ){
+if( typeof args.version !== 'undefined' ){
+    var packageJson = require("../package.json");
+    console.log("v" + packageJson.version);
+}
+else if( typeof args.help !== 'undefined' ){
     var options = [
+        {
+            cmd: "--version",
+            desc: "Shows current version of linecounter"
+        },
         {
             cmd: "--help",
             desc: "Shows available commands with descriptions"
