@@ -22,57 +22,95 @@ process.argv.forEach(function(val){
     }
 });
 
-if( typeof args.path === 'undefined' ){
-    args.path = "./";
-}
-
-const LineCounter = require("../index").LineCounter;
-const ExtensionsFactory = require("../index").ExtensionsFactory;
-const Rules = require("../index").Rules;
-
-var lc = new LineCounter();
-lc.setPath(args.path);
-if( typeof args.extensions !== 'undefined' ){
-    lc.setExtensions(ExtensionsFactory.from(args.extensions));
-}
-else if( typeof args.except !== 'undefined' ){
-    lc.setExtensions(ExtensionsFactory.except(args.except));
-}
-if( typeof args.rules !== 'undefined' ){
-    var rules = args.rules.split('|');
-    rules.forEach(function(rule){
-        if( rule.length === 0 ){
-            return;
+if( typeof args.help !== 'undefined' ){
+    var options = [
+        {
+            cmd: "--help",
+            desc: "Shows available commands with descriptions"
+        },
+        {
+            cmd: "--path",
+            desc: "The directory path which will be used as starting point. If path is not specified then target directory will be current directory",
+            ex: "--path=\"/var/www/html/\""
+        },
+        {
+            cmd: "--extensions",
+            desc: "Comma separated extension list. Only the files with given extensions will be counted",
+            ex: "--extensions=\"php, js, java\""
+        },
+        {
+            cmd: "--except",
+            desc: "Comma separated extension list which will be ignored",
+            ex: "--except=\"php, js, java\""
+        },
+        {
+            cmd: "--rules",
+            desc: "Additional rules. See readme for rule list",
+            ex: "--rules=\"ignoreHidden|ignoreDirs(node_modules,vendor)\""
         }
-        if( rule.indexOf("(") > 0 ){
-            var ruleTokens = rule.replace("(", "+").replace(")", "").split("+"); // ignoreDir(test) -> ignoreDir+test
-            rule = ruleTokens[0];
-            var ruleArgs = ruleTokens[1].split(",");
-            if( typeof Rules[rule] !== 'undefined' ){
-                ruleArgs.unshift(Rules[rule]); // Add rule to the beginning of the array
-                lc.addRule.apply(lc, ruleArgs);
+    ];
+    var space = " ";
+    console.log('\x1b[33m%s\x1b[0m', "Options");
+    for( var j = 0; j < options.length; j++ ){
+        console.log('   \x1b[36m%s\x1b[0m', options[j].cmd, space.repeat(12 - options[j].cmd.length), options[j].desc);
+        if( typeof options[j].ex !== 'undefined' ){
+            console.log(space.repeat(16), "Usage: " + options[j].ex);
+        }
+        console.log("");
+    }
+}
+else{
+    if( typeof args.path === 'undefined' ){
+        args.path = "./";
+    }
+
+    const LineCounter = require("../index").LineCounter;
+    const ExtensionsFactory = require("../index").ExtensionsFactory;
+    const Rules = require("../index").Rules;
+
+    var lc = new LineCounter();
+    lc.setPath(args.path);
+    if( typeof args.extensions !== 'undefined' ){
+        lc.setExtensions(ExtensionsFactory.from(args.extensions));
+    }
+    else if( typeof args.except !== 'undefined' ){
+        lc.setExtensions(ExtensionsFactory.except(args.except));
+    }
+    if( typeof args.rules !== 'undefined' ){
+        var rules = args.rules.split('|');
+        rules.forEach(function(rule){
+            if( rule.length === 0 ){
+                return;
+            }
+            if( rule.indexOf("(") > 0 ){
+                var ruleTokens = rule.replace("(", "+").replace(")", "").split("+"); // ignoreDir(test) -> ignoreDir+test
+                rule = ruleTokens[0];
+                var ruleArgs = ruleTokens[1].split(",");
+                if( typeof Rules[rule] !== 'undefined' ){
+                    ruleArgs.unshift(Rules[rule]); // Add rule to the beginning of the array
+                    lc.addRule.apply(lc, ruleArgs);
+                }
+                else{
+                    console.error("Rule not found: " + rule);
+                }
             }
             else{
-                console.error("Rule not found: " + rule);
+                if( typeof Rules[rule] !== 'undefined' ){
+                    lc.addRule(Rules[rule]);
+                }
+                else{
+                    console.error("Rule not found: " + rule);
+                }
             }
-        }
-        else{
-            if( typeof Rules[rule] !== 'undefined' ){
-                lc.addRule(Rules[rule]);
-            }
-            else{
-                console.error("Rule not found: " + rule);
-            }
-        }
-    });
+        });
+    }
+    try{
+        lc.getLines(function(result){
+            console.log("Total files: " + result.files);
+            console.log("Total lines: " + result.lines);
+        });
+    }
+    catch(e){
+        console.log(e.message);
+    }
 }
-try{
-    lc.getLines(function(result){
-        console.log("Total files: " + result.files);
-        console.log("Total lines: " + result.lines);
-    });
-}
-catch(e){
-    console.log(e.message);
-}
-
