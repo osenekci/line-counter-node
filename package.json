@@ -1,6 +1,6 @@
 {
   "name": "line-counter-node",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Recursive nodejs line counter library",
   "author": "Özgür Senekci <ozgursenekci@gmail.com>",
   "repository": {
