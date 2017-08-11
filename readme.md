@@ -95,6 +95,7 @@ const Rules = require("line-counter-node").Rules;
 - Rules.ignoreDir           // Ignore directory rule
 - Rules.ignoreDirs          // Ignore multiple directories
 - Rules.ignoreHidden        // Ignores dotfiles and dotfolders (.git, .idea, .gitignore...)
+- Rules.regex               // Regular expression rule. Allows only the matched file or directories
 
 ### Example Usage
 ```node

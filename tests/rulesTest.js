@@ -98,8 +98,22 @@ describe("File", function(){
 
     describe("#ingoreHidden()", function(){
         it("should not accept dotfiles", function(){
-           assert.equal(false, Rules.ignoreHidden(".dirName", stats));
+            assert.equal(false, Rules.ignoreHidden(".dirName", stats));
             assert.equal(true, Rules.ignoreHidden("dirName", stats));
+        });
+    });
+
+    describe("#regexFile()", function(){
+        it("should allow given regex", function(){
+            assert.equal(true, Rules.regexFile("fileName.txt", stats, "^file[a-zA-Z]+\.txt$"));
+            assert.equal(false, Rules.regexFile("fileName.txt", stats, "^file[a-zA-Z]\.txt$"));
+        });
+    });
+
+    describe("#regexDir()", function(){
+        it("should allow given regex", function(){
+            assert.equal(true, Rules.regexFile("dirName", stats, "^dir[a-zA-Z]+$"));
+            assert.equal(false, Rules.regexFile("dirName", stats, "^dir[a-zA-Z]$"));
         });
     });
 
