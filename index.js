@@ -5,9 +5,11 @@
 var ExtensionsFactory = require("./lib/Extensions");
 var LineCounter = require("./lib/LineCounter");
 var Rules = require("./lib/Rules");
+var Events = require("./lib/Events");
 
 module.exports = {
     LineCounter: LineCounter,
     ExtensionsFactory: ExtensionsFactory,
-    Rules: Rules
+    Rules: Rules,
+    Events: Events
 };
