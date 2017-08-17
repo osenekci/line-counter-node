@@ -1,6 +1,6 @@
 {
   "name": "line-counter-node",
-  "version": "1.1.7",
+  "version": "1.2.0",
   "description": "Recursive nodejs line counter library",
   "author": "Özgür Senekci <ozgursenekci@gmail.com>",
   "repository": {
@@ -15,6 +15,9 @@
     "linecounter"
   ],
   "license": "MIT",
+  "dependencies": {
+    "colors": "^1.1.2"
+  },
   "devDependencies": {
     "mocha": "3.4.2"
   },

@@ -14,17 +14,18 @@ npm install -g line-counter-node
 
 ## CLI Usage
 After installing LineCounter, binary file will be added to path
-- {optional} Version: Show current version of linecounter
-- {optional} Help: Shows available commands with descriptions
-- {optional} Path: The directory path which will be used as starting point. If path is not specified then target directory will be current directory
-- {optional} Extensions: Comma separated extension list. Only the files with given extensions will be counted
-- {optional} Except: Comma separated extension list which will be ignored
-- {optional} Rules: Additional rules. See available rules section for rule list
+- --version: Show current version of linecounter
+- --help: Shows available commands with descriptions
+- --verbose: Shows accepted, ignored files and directories
+- --path: The directory path which will be used as starting point. If path is not specified then target directory will be current directory
+- --extensions: Comma separated extension list. Only the files with given extensions will be counted
+- --except: Comma separated extension list which will be ignored
+- --rules: Additional rules. See available rules section for rule list
 ```bash
 linecounter # All files will be counted in current directory
 linecounter --version
 linecounter --help  # Shows available options
-linecounter --path="path/to/directory"  # All files will be counted
+linecounter --path="path/to/directory" --verbose # All files will be counted and printed
 linecounter --path="path/to/directory" --extensions="comma, separated, extensions"
 linecounter --path="path/to/directory" --except="js"  # All files except the files with js extension will be counted
 linecounter --path="path/to/directory" --rules="ignoreDir(node_modules)"
@@ -53,6 +54,7 @@ var lc = new LineCounter();
 - lc.setRules(rules: Array)  // Overrides existing rules with new ones
 - lc.addRule(rule: Function, arg1, arg2, ...)   // Adds new rule
 - lc.clearRules()   // Resets all rules
+- lc.on(eventName: String, args1, arg2...)   // Bind event listeners
 
 #### Creating custom rule
 ```node
@@ -66,6 +68,17 @@ function customRule(name, stats, arg1, arg2, arg3, ...){
     }
 }
 ```
+
+### Events
+```node
+const Events = require("line-counter-node").Events;
+```
+- Events.ERROR  // Cause: If given path is invalid or some file or directory could not read. Arg: error message
+- Events.FILE_ACCEPTED  // Cause: If if a file is accepted while scanning files. Arg: file path
+- Events.DIR_ACCEPTED   // Cause: If if a directory is accepted while scanning files. Arg: file path
+- Events.FILE_IGNORED   // Cause: If if a file is ignored while scanning files. Arg: file path
+- Events.DIR_IGNORED    // Cause: If if a directory is ignored while scanning files. Arg: file path
+- Events.FILE_PROCESSED // Cause: File is counted successfully. Arg: {totalFiles: int, completedFiles: int, path: string, lines: int(for current file)}
 
 ### ExtensionsFactory
 From method allows user to specify the allowed extensions. Only given extensions will be counted
@@ -102,11 +115,15 @@ const Rules = require("line-counter-node").Rules;
 const ExtensionsFactory = require("line-counter-node").ExtensionsFactory;
 const LineCounter = require("line-counter-node").LineCounter;
 const Rules = require("line-counter-node").Rules;
+const Events = require("line-counter-node").Events;
 var lc = new LineCounter();
 lc.setPath("/var/www/html/");
 lc.setExtensions(ExtensionsFactory.from("js"));
 lc.addRule(Rules.ignoreDirs, ".git", ".idea", "node_modules");  // Ignores given directories
 lc.addRule(Rules.filePrefix, "line");   // Only the file names starts with "line" are allowed, others will be ignored
+lc.on(Events.ERROR, function(err){
+    console.error(err);
+});
 lc.getLines(function(result){
     console.log("Total files: " + result.files);
     console.log("Total lines: " + result.lines);

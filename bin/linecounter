@@ -13,6 +13,8 @@
  * * * * * * * * * * * * * * * * * * * *
  */
 
+const colors = require("colors");
+
 var args = {};
 
 process.argv.forEach(function(val){
@@ -37,6 +39,10 @@ else if( typeof args.help !== 'undefined' ){
             desc: "Shows available commands with descriptions"
         },
         {
+            cmd: "--verbose",
+            desc: "Shows accepted, ignored files and directories"
+        },
+        {
             cmd: "--path",
             desc: "The directory path which will be used as starting point. If path is not specified then target directory will be current directory",
             ex: "--path=\"/var/www/html/\""
@@ -58,9 +64,9 @@ else if( typeof args.help !== 'undefined' ){
         }
     ];
     var space = " ";
-    console.log('\x1b[33m%s\x1b[0m', "Options");
+    console.log(colors.yellow("Options"));
     for( var j = 0; j < options.length; j++ ){
-        console.log('   \x1b[36m%s\x1b[0m', options[j].cmd, space.repeat(12 - options[j].cmd.length), options[j].desc);
+        console.log('   ', colors.cyan(options[j].cmd), space.repeat(12 - options[j].cmd.length), options[j].desc);
         if( typeof options[j].ex !== 'undefined' ){
             console.log(space.repeat(16), "Usage: " + options[j].ex);
         }
@@ -75,6 +81,7 @@ else{
     const LineCounter = require("../index").LineCounter;
     const ExtensionsFactory = require("../index").ExtensionsFactory;
     const Rules = require("../index").Rules;
+    const Events = require("../index").Events;
 
     var lc = new LineCounter();
     lc.setPath(args.path);
@@ -113,6 +120,20 @@ else{
         });
     }
     try{
+        if( typeof args.verbose !== 'undefined' ){
+            lc.on(Events.FILE_ACCEPTED, function(fileName){
+                logFile(fileName, true);
+            });
+            lc.on(Events.FILE_IGNORED, function(fileName){
+                logFile(fileName, false);
+            });
+            lc.on(Events.DIR_IGNORED, function(fileName){
+                logFile(fileName, false);
+            });
+        }
+        lc.on(Events.ERROR, function(e){
+            console.log(colors.red(e));
+        });
         lc.getLines(function(result){
             console.log("Total files: " + result.files);
             console.log("Total lines: " + result.lines);
@@ -120,5 +141,14 @@ else{
     }
     catch(e){
         console.log(e.message);
+    }
+}
+
+function logFile(file, accepted){
+    if( accepted ){
+        console.log(colors.green("[ACCEPT]"), " ", file);
+    }
+    else{
+        console.log(colors.gray("[IGNORE]"), " ", file);
     }
 }
