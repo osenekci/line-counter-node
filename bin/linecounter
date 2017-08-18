@@ -132,7 +132,7 @@ else{
             });
         }
         lc.on(Events.ERROR, function(e){
-            console.log(colors.red(e));
+            console.log(colors.red("[ERROR]"), "  ", e);
         });
         lc.getLines(function(result){
             console.log("Total files: " + result.files);

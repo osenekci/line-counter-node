@@ -29,8 +29,8 @@ linecounter --path="path/to/directory" --verbose # All files will be counted and
 linecounter --path="path/to/directory" --extensions="comma, separated, extensions"
 linecounter --path="path/to/directory" --except="js"  # All files except the files with js extension will be counted
 linecounter --path="path/to/directory" --rules="ignoreDir(node_modules)"
-lineCounter --path="path/to/directory" --rules="ignoreHidden|filePostFix(test)"  # multiple rule usage. Separate rules with | character
-linecounter --path="path/to/directory" --rules="ignoreDirs(node_modules,tests,lib,src)"   # multiple aguments with one rule usage
+lineCounter --path="path/to/directory" --rules="ignoreHidden|filePostfix(test)"  # multiple rule usage. Separate rules with | character
+linecounter --path="path/to/directory" --rules="ignoreDir(node_modules,tests,lib,src)"   # multiple aguments with one rule usage
 ```
 ### Example output
 ```
@@ -103,12 +103,12 @@ const Rules = require("line-counter-node").Rules;
 - Rules.filePostfix         // Name postfix rule (without extension)
 - Rules.fileIgnorePrefix    // Name ignore prefix rule
 - Rules.fileIgnorePostfix   // Name ignore postfix rule
-- Rules.ignoreFile          // Ignore file rule
-- Rules.ignoreFiles         // Ignore multiple files
-- Rules.ignoreDir           // Ignore directory rule
-- Rules.ignoreDirs          // Ignore multiple directories
+- Rules.ignoreFile          // Ignore multiple files
+- Rules.ignoreDir           // Ignore multiple directories
 - Rules.ignoreHidden        // Ignores dotfiles and dotfolders (.git, .idea, .gitignore...)
 - Rules.regex               // Regular expression rule. Allows only the matched file or directories
+- Rules.ignoreExt           // Ignore multiple extensions
+- Rules.dev                 // Developer rule. Ignored dot files, some extensions (md, iml, yml, ...) and some vendor directories (node_modules, bower_components, ...)
 
 ### Example Usage
 ```node
@@ -119,7 +119,7 @@ const Events = require("line-counter-node").Events;
 var lc = new LineCounter();
 lc.setPath("/var/www/html/");
 lc.setExtensions(ExtensionsFactory.from("js"));
-lc.addRule(Rules.ignoreDirs, ".git", ".idea", "node_modules");  // Ignores given directories
+lc.addRule(Rules.ignoreDir, ".git", ".idea", "node_modules");  // Ignores given directories
 lc.addRule(Rules.filePrefix, "line");   // Only the file names starts with "line" are allowed, others will be ignored
 lc.on(Events.ERROR, function(err){
     console.error(err);
