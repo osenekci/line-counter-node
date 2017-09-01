@@ -18,7 +18,7 @@ After installing LineCounter, binary file will be added to path. You can run the
 - -v, --version: Show current version of linecounter
 - -h, --help: Shows available commands with descriptions
 
-###Methods
+### Methods
 - count: Scans given directory recursively and returns lines of founded files
     - -v, --verbose: Shows accepted, ignored files and directories
     - -p, --path: The directory path which will be used as starting point. If path is not specified then target directory will be current directory
