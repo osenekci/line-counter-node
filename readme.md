@@ -13,24 +13,28 @@ npm install -g line-counter-node
 ```
 
 ## CLI Usage
-After installing LineCounter, binary file will be added to path
-- --version: Show current version of linecounter
-- --help: Shows available commands with descriptions
-- --verbose: Shows accepted, ignored files and directories
-- --path: The directory path which will be used as starting point. If path is not specified then target directory will be current directory
-- --extensions: Comma separated extension list. Only the files with given extensions will be counted
-- --except: Comma separated extension list which will be ignored
-- --rules: Additional rules. See available rules section for rule list
+After installing LineCounter, binary file will be added to path. You can run the script as linecounter or lc.
+### Options
+- -v, --version: Show current version of linecounter
+- -h, --help: Shows available commands with descriptions
+
+###Methods
+- count: Scans given directory recursively and returns lines of founded files
+    - -v, --verbose: Shows accepted, ignored files and directories
+    - -p, --path: The directory path which will be used as starting point. If path is not specified then target directory will be current directory
+    - -e, --extensions: Comma separated extension list. Only the files with given extensions will be counted
+    - -i, --except: Comma separated extension list which will be ignored
+    - -r, --rules: Additional rules. See available rules section for rule list
 ```bash
 linecounter # All files will be counted in current directory
 linecounter --version
 linecounter --help  # Shows available options
-linecounter --path="path/to/directory" --verbose # All files will be counted and printed
-linecounter --path="path/to/directory" --extensions="comma, separated, extensions"
-linecounter --path="path/to/directory" --except="js"  # All files except the files with js extension will be counted
-linecounter --path="path/to/directory" --rules="ignoreDir(node_modules)"
-lineCounter --path="path/to/directory" --rules="ignoreHidden|filePostfix(test)"  # multiple rule usage. Separate rules with | character
-linecounter --path="path/to/directory" --rules="ignoreDir(node_modules,tests,lib,src)"   # multiple aguments with one rule usage
+linecounter count -p "path/to/directory" -v # All files will be counted and printed
+linecounter count --path="path/to/directory" --extensions="comma, separated, extensions"
+linecounter count --path="path/to/directory" --except="js"  # All files except the files with js extension will be counted
+linecounter count --path="path/to/directory" --rules="ignoreDir(node_modules)"
+lineCounter count --path="path/to/directory" --rules="ignoreHidden|filePostfix(test)"  # multiple rule usage. Separate rules with | character
+linecounter count --path="path/to/directory" --rules="ignoreDir(node_modules,tests,lib,src)"   # multiple aguments with one rule usage
 ```
 ### Example output
 ```
