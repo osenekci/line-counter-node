@@ -31,6 +31,7 @@ After installing LineCounter, binary file will be added to path. You can run the
     - -l, --list: Displays all saved configurations
     - -s, --show: Shows a saved configuration's details
     - -r, --remove: Removes a saved configuration
+    - -d, --destroy: Removes all configurations by removing configuration file
 
 #### Basic Usage
 There are 2 ways to use options.
@@ -65,6 +66,7 @@ linecounter count --config="myConfiguration" # Following options will be used: -
 linecounter config --list
 linecounter config --show=myConfiguration # Shows details of myConfiguration
 linecounter config --remove=myConfiguration # Removes myConfiguration
+linecounter config --destroy
 ```
 
 #### Example Output of Count (without --verbose option)

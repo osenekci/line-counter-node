@@ -103,6 +103,12 @@ var Commands = {
                     alias: "r",
                     description: "Removes a saved configuration",
                     usage: "-r confName or --remove=confName"
+                },
+                destroy: {
+                    name: "destroy",
+                    alias: "d",
+                    description: "Removes all configurations by removing configuration file",
+                    usage: "-d or --destroy"
                 }
             }
         }
@@ -212,7 +218,7 @@ function Cli(args){
 }
 
 function version(){
-    console.log("v" + require("../package.json").version);
+    console.log(getVersion());
 }
 
 function help(){
@@ -229,26 +235,28 @@ function help(){
             if( typeof globals[i].usage !== 'undefined' ){
                 console.log(space.repeat(24), "Usage: " + globals[i].usage);
             }
-            console.log("");
         }
     }
 
+    console.log("");
+
     console.log(colors.yellow("Methods"));
+    var counter = 1;
     for( i in commands ){
         if( commands.hasOwnProperty(i) ){
-            console.log(' ', commands[i].name, space.repeat(20 - commands[i].name.length));
+            console.log(' ' + colors.underline(counter + ') ' + commands[i].name), space.repeat(20 - commands[i].name.length));
             var opts = commands[i].options;
             for( var j in opts ){
                 if( opts.hasOwnProperty(j) ){
                     cmd = getOptionName(opts[j]);
-                    console.log('  ', colors.cyan(cmd), space.repeat(19 - cmd.length), opts[j].description);
+                    console.log('   ', colors.cyan(cmd), space.repeat(19 - cmd.length), opts[j].description);
                     if( typeof opts[j].usage !== 'undefined' ){
-                        console.log(space.repeat(23), "Usage: " + opts[j].usage);
+                        console.log(space.repeat(24), "Usage: " + opts[j].usage);
                     }
-                    console.log("");
                 }
             }
             console.log("");
+            counter++;
         }
     }
 
@@ -259,8 +267,8 @@ function help(){
             ' /  /___ / // /  / //  __/  /  /___/ /_/ // /__/ // /  / //  __//  __// /\n' +
             ' \\_____//_//_/  /_/ \\___/   \\_____/\\____/ \\_____//_/  /_/ \\___/ \\___//_/\n';
         console.log(name);
-        var versionInfo = colors.cyan("Line Counter") + " version " + colors.yellow(require("../package.json").version);
-        var nudeVersionInfo = "Line Counter version " + require("../package.json").version;
+        var versionInfo = colors.cyan("Line Counter") + " version " + colors.yellow(getVersion());
+        var nudeVersionInfo = "Line Counter version " + getVersion();
         var splitName = name.split("\n");
         var createdBy = "Created By Özgür Senekci";
         var lastLineLength = splitName[splitName.length - 2].length;
@@ -420,27 +428,21 @@ function count(args){
 
 
 function config(args){
+    var confFile = getConfFile(), content, exist = false;
+    if( fs.existsSync(confFile) ){
+        content = JSON.parse(fs.readFileSync(confFile));
+        exist = true;
+    }
     if( args.length === 0 ){
-        console.log(colors.red("Missing options"));
+        listConfigurations();
     }
     else{
-        var confFile = getConfFile(), content, exist = false;
-        if( fs.existsSync(confFile) ){
-            content = JSON.parse(fs.readFileSync(confFile));
-            exist = true;
-        }
         var list = args.list || args.l || undefined;
         var show = args.show || args.s || undefined;
         var remove = args.remove || args.r || undefined;
+        var destroy = args.destroy || args.d || undefined;
         if( typeof list !== 'undefined' && list === true ){
-            if( exist ){
-                console.log(colors.yellow("List of available configurations:"));
-                for( var i in content ){
-                    if( content.hasOwnProperty(i) ){
-                        console.log('  -', colors.cyan(i));
-                    }
-                }
-            }
+            listConfigurations();
         }
         else if( typeof show !== 'undefined' ){
             if( exist ){
@@ -471,9 +473,36 @@ function config(args){
                 console.log(colors.red("Configuration does not exist"));
             }
         }
+        else if( typeof destroy !== 'undefined' ){
+            if( exist ){
+                fs.unlinkSync(confFile);
+                console.log(colors.yellow("Configurations are removed"));
+            }
+        }
+        else{
+            console.log(colors.red("Invalid options"));
+        }
+    }
+
+    function listConfigurations(){
+        if( exist ){
+            console.log(colors.yellow("List of available configurations:"));
+            for( var i in content ){
+                if( content.hasOwnProperty(i) ){
+                    console.log('  -', colors.cyan(i));
+                }
+            }
+        }
+        else{
+            console.log(colors.yellow("No configurations found"));
+        }
     }
 }
 
+
+function getVersion(){
+    return "v" + require("../package.json").version;
+}
 
 function getConfFile(){
     return path.join(homedir(), ".linecounter.json");
