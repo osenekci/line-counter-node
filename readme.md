@@ -33,6 +33,9 @@ After installing LineCounter, binary file will be added to path. You can run the
     - -r, --remove: Removes a saved configuration
 
 #### Basic Usage
+There are 2 ways to use options.
+- Full name: Option name must start with double dashes (--) and equal operator (=) is required to assign a value to option. Example --optionName=value or --optionWithoutValue
+- Alias: Option name must start with a single dash character (-) and a single space is required between option name and value to assign option to a value. Example: -o value or -o
 ```bash
 linecounter [globalOptions] [method] [methodOptions]
 lc [globalOptions] [method] [methodOptions]  # lc is alias of linecounter
