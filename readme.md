@@ -25,18 +25,46 @@ After installing LineCounter, binary file will be added to path. You can run the
     - -e, --extensions: Comma separated extension list. Only the files with given extensions will be counted
     - -i, --except: Comma separated extension list which will be ignored
     - -r, --rules: Additional rules. See available rules section for rule list
+    - -s, --save: Saves all options except path so that it can be reused again. Configuration file path $HOME/.linecounter.json
+    - -c, --config: Uses a saved configuration. All options except path will be used from given configuration
+- config: Lists, shows and removes available configurations
+    - -l, --list: Displays all saved configurations
+    - -s, --show: Shows a saved configuration's details
+    - -r, --remove: Removes a saved configuration
+
+#### Basic Usage
 ```bash
-linecounter # All files will be counted in current directory
-linecounter --version
-linecounter --help  # Shows available options
-linecounter count -p "path/to/directory" -v # All files will be counted and printed
-linecounter count --path="path/to/directory" --extensions="comma, separated, extensions"
-linecounter count --path="path/to/directory" --except="js"  # All files except the files with js extension will be counted
-linecounter count --path="path/to/directory" --rules="ignoreDir(node_modules)"
-lineCounter count --path="path/to/directory" --rules="ignoreHidden|filePostfix(test)"  # multiple rule usage. Separate rules with | character
-linecounter count --path="path/to/directory" --rules="ignoreDir(node_modules,tests,lib,src)"   # multiple aguments with one rule usage
+linecounter [globalOptions] [method] [methodOptions]
+lc [globalOptions] [method] [methodOptions]  # lc is alias of linecounter
 ```
-### Example output
+
+#### Options Usage
+```bash
+linecounter # Same with --help
+linecounter --version
+linecounter --help
+```
+
+#### Count Method Usage
+```bash
+linecounter count --path="/var/www/html" --verbose # All files will be counted and printed under the current directory
+linecounter count --extensions="comma, separated, extensions"
+linecounter count --except="js"  # All files except the files with js extension will be counted
+linecounter count --rules="ignoreDir(node_modules)"
+lineCounter count --rules="ignoreHidden|filePostfix(test)"  # multiple rule usage. Separate rules with | character
+linecounter count -p "path/to/directory" -r "ignoreDir(node_modules,tests,lib,src)"   # multiple aguments with one rule usage
+linecounter count -e "comma, separated, extensions" -r "ignoreDir(node_modules,tests,lib,src)" -v --save="myConfiguration" # Saves options
+linecounter count --config="myConfiguration" # Following options will be used: -e "comma, separated, extensions" -r "ignoreDir(node_modules,tests,lib,src)" -v
+```
+
+#### Config Method Usage
+```bash
+linecounter config --list
+linecounter config --show=myConfiguration # Shows details of myConfiguration
+linecounter config --remove=myConfiguration # Removes myConfiguration
+```
+
+#### Example Output of Count (without --verbose option)
 ```
 Total files: 755
 Total lines: 338203

@@ -13,6 +13,9 @@
  * * * * * * * * * * * * * * * * * * * *
  */
 
+const homedir = require("homedir");
+const path = require("path");
+const fs = require("fs");
 const colors = require("colors");
 
 var Commands = {
@@ -59,11 +62,47 @@ var Commands = {
                     description: "Additional rules. See readme for rule list",
                     usage: "-r \"ignoreHidden\" or --rules=\"ignoreHidden|ignoreDirs(node_modules,vendor)\""
                 },
+                save: {
+                    name: "save",
+                    alias: "s",
+                    description: "Saves all options except path. Configuration file path $HOME/.linecounter.json",
+                    usage: "-s confName or --save=confName"
+                },
+                config: {
+                    name: "config",
+                    alias: "c",
+                    description: "Uses a saved configuration. All options except path will be used from given configuration",
+                    usage: "-c confName or --config=confName"
+                },
                 verbose: {
                     name: "verbose",
                     alias: "v",
                     description: "Shows accepted, ignored files and directories",
                     usage: undefined
+                }
+            }
+        },
+        config: {
+            name: "config",
+            description: "Lists, shows and removes available configurations",
+            options: {
+                list: {
+                    name: "list",
+                    alias: "l",
+                    description: "Displays all saved configurations",
+                    usage: "-l or --list"
+                },
+                show: {
+                    name: "show",
+                    alias: "s",
+                    description: "Shows a saved configuration's details",
+                    usage: "-s confName or --show=confName"
+                },
+                remove: {
+                    name: "remove",
+                    alias: "r",
+                    description: "Removes a saved configuration",
+                    usage: "-r confName or --remove=confName"
                 }
             }
         }
@@ -128,6 +167,7 @@ function Cli(args){
 
     function parseArguments(){
         var mapping = {};
+        mapping.length = 0;
         for( var i = 0; i < args.length; i++ ){
             if( args[i].indexOf("--") === 0 || args[i].indexOf("-") === 0 ){
                 var argName = args[i].replace(/-+/, "").trim();
@@ -157,6 +197,7 @@ function Cli(args){
                             mapping[argName] = true;
                         }
                     }
+                    mapping.length++;
                 }
             }
             else{
@@ -238,16 +279,72 @@ function help(){
 }
 
 function count(args){
-    var path = args.path || args.p || "./";
-    var extensions = args.extensions || args.e || undefined;
-    var except = args.except || args.i || undefined;
-    var rules = args.rules || args.r || undefined;
-    var verbose = args.verbose || args.v || undefined;
-
     const LineCounter = require("../index").LineCounter;
     const ExtensionsFactory = require("../index").ExtensionsFactory;
     const Rules = require("../index").Rules;
     const Events = require("../index").Events;
+
+    var path = args.path || args.p || "./";
+    var config = args.config || args.c || undefined;
+    var save = args.save || args.s || undefined;
+    var extensions, except, rules, verbose, confFile, content;
+
+    try{
+        if( typeof config !== 'undefined' ){
+            confFile = getConfFile();
+            if( fs.existsSync(confFile) ){
+                content = JSON.parse(fs.readFileSync(confFile));
+                if( typeof content[config] === "undefined" ){
+                    console.log(colors.red("Invalid configuration"));
+                    return;
+                }
+                else{
+                    var conf = content[config];
+                    extensions = conf.extensions;
+                    except = conf.except;
+                    rules = conf.rules;
+                    verbose = conf.verbose;
+                }
+                if( verbose === true ){
+                    console.log(colors.yellow("Configuration:"));
+                    console.log("", JSON.stringify(content[config]));
+                    console.log("");
+                }
+            }
+            else{
+                console.log(colors.red("Invalid configuration"));
+                return;
+            }
+        }
+        else{
+            extensions = args.extensions || args.e || undefined;
+            except = args.except || args.i || undefined;
+            rules = args.rules || args.r || undefined;
+            verbose = args.verbose || args.v || undefined;
+
+            // Save config if save is enabled
+            if( typeof save !== 'undefined' ){
+                confFile = getConfFile();
+                if( fs.existsSync(confFile) ){
+                    content = JSON.parse(fs.readFileSync(confFile));
+                }
+                else{
+                    content = {};
+                }
+                content[save] = {
+                    extensions: extensions,
+                    except: except,
+                    rules: rules,
+                    verbose: verbose
+                };
+                fs.writeFileSync(confFile, JSON.stringify(content));
+            }
+        }
+    }
+    catch(e){
+        console.log(colors.red("Configuration file could not be processed. This could be a permission issue"));
+        return;
+    }
 
     var lc = new LineCounter();
     lc.setPath(path);
@@ -287,6 +384,7 @@ function count(args){
     }
     try{
         if( typeof verbose !== 'undefined' ){
+            console.log(colors.yellow("Scan results:"));
             lc.on(Events.FILE_ACCEPTED, function(fileName){
                 logFile(fileName, true);
             });
@@ -298,25 +396,87 @@ function count(args){
             });
         }
         lc.on(Events.ERROR, function(e){
-            console.log(colors.red("[ERROR]"), "  ", e);
+            console.log(colors.red(" [ERROR]"), "  ", e);
         });
         lc.getLines(function(result){
+            console.log("");
             console.log("Total files: " + result.files);
             console.log("Total lines: " + result.lines);
         });
     }
     catch(e){
-        console.log(colors.red("[ERROR]"), "  ", e.message);
+        console.log(colors.red(" [ERROR]"), "  ", e.message);
     }
 
     function logFile(file, accepted){
         if( accepted ){
-            console.log(colors.green("[ACCEPT]"), " ", file);
+            console.log(colors.green(" [ACCEPT]"), " ", file);
         }
         else{
-            console.log(colors.gray("[IGNORE]"), " ", file);
+            console.log(colors.gray(" [IGNORE]"), " ", file);
         }
     }
+}
+
+
+function config(args){
+    if( args.length === 0 ){
+        console.log(colors.red("Missing options"));
+    }
+    else{
+        var confFile = getConfFile(), content, exist = false;
+        if( fs.existsSync(confFile) ){
+            content = JSON.parse(fs.readFileSync(confFile));
+            exist = true;
+        }
+        var list = args.list || args.l || undefined;
+        var show = args.show || args.s || undefined;
+        var remove = args.remove || args.r || undefined;
+        if( typeof list !== 'undefined' && list === true ){
+            if( exist ){
+                console.log(colors.yellow("List of available configurations:"));
+                for( var i in content ){
+                    if( content.hasOwnProperty(i) ){
+                        console.log('  -', colors.cyan(i));
+                    }
+                }
+            }
+        }
+        else if( typeof show !== 'undefined' ){
+            if( exist ){
+                if( typeof content[show] !== 'undefined' ){
+                    console.log(colors.yellow("Configuration", colors.cyan("'" + show + "'") + colors.yellow(":")));
+                    console.log("  -", JSON.stringify(content[show]));
+                }
+                else{
+                    console.log(colors.red("Configuration does not exist"));
+                }
+            }
+            else{
+                console.log(colors.red("Configuration does not exist"));
+            }
+        }
+        else if( typeof remove !== 'undefined' ){
+            if( exist ){
+                if( typeof content[remove] !== 'undefined' ){
+                    delete content[remove];
+                    fs.writeFileSync(confFile, JSON.stringify(content));
+                    console.log(colors.yellow("Configuration removed", colors.cyan("'" + remove + "'")));
+                }
+                else{
+                    console.log(colors.red("Configuration does not exist"));
+                }
+            }
+            else{
+                console.log(colors.red("Configuration does not exist"));
+            }
+        }
+    }
+}
+
+
+function getConfFile(){
+    return path.join(homedir(), ".linecounter.json");
 }
 
 
@@ -324,6 +484,7 @@ var cli = new Cli(process.argv);
 cli.addGlobalOption(Commands.global.version, version);
 cli.addGlobalOption(Commands.global.help, help);
 cli.addCommand("count", count);
+cli.addCommand("config", config);
 
 cli.execute();
 
