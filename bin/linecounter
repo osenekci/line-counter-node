@@ -407,7 +407,9 @@ function count(args){
             console.log(colors.red(" [ERROR]"), "  ", e);
         });
         lc.getLines(function(result){
-            console.log("");
+            if( typeof verbose !== 'undefined' ){
+                console.log("");
+            }
             console.log("Total files: " + result.files);
             console.log("Total lines: " + result.lines);
         });
